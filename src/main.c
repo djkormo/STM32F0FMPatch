@@ -146,8 +146,8 @@ void  InitBoard()
 {
 
 
-        SystemInit();
-        SystemCoreClockUpdate();
+        //SystemInit();
+        //SystemCoreClockUpdate();
 
         //Enable GPIO Clock
         RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOC, ENABLE);
@@ -351,15 +351,17 @@ void InitADC(void)
 void InitTimer()
 {
 			RCC_PLLConfig(RCC_PLLSource_HSI, RCC_PLLMul_6);
-	 	 	SystemInit(); //Ensure CPU is running at correctly set clock speed
-	     	SystemCoreClockUpdate(); //Update SystemCoreClock variable to current clock speed
+	 	 	//SystemInit(); //Ensure CPU is running at correctly set clock speed
+	     	//SystemCoreClockUpdate(); //Update SystemCoreClock variable to current clock speed
 	     	//SysTick_Config(SystemCoreClock/1000); //Set up a systick interrupt every millisecond
-	     	SysTick_Config(SystemCoreClock);
-	     	SystemCoreClockUpdate();
+	     	//SysTick_Config(SystemCoreClock);
+	     	//SystemCoreClockUpdate();
+			TTB.TIM_ClockDivision = TIM_CKD_DIV1;
             TTB.TIM_CounterMode = TIM_CounterMode_Up;
+            TTB.TIM_RepetitionCounter = 0;
             TTB.TIM_Prescaler = 1; //  4800 kHz // was 300-1
             TTB.TIM_Period = 1; //1Hz; // was 10-1
-            TTB.TIM_RepetitionCounter = 0;
+
             TIM_TimeBaseInit(TIM3, &TTB);
             TIM_Cmd(TIM3, ENABLE);
 
@@ -486,11 +488,16 @@ void TIM3_IRQHandler()
 							// sending 12-bits output signal
 			DAC_SetChannel1Data(DAC_Align_12b_R,DAC1OutputData);
 
-
-
+			// first TRY
+			//lutFcIndex1+=accumulator1>>(22);
 			lutFcIndex1+=lutStep1;
+
 			lutFcIndex2+=lutStep2;
 			lutFcIndex3+=lutStep3;
+
+			//lutFcIndex1+=accumulator10bits3;
+			//lutFcIndex2+=accumulator10bits3;
+			//lutFcIndex3+=accumulator10bits3;
 			// *BAD
 			//lutFcIndex=accumulator10bits;
 
@@ -503,7 +510,7 @@ void TIM3_IRQHandler()
 
 
 
-       TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+    	TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
 
     }
 
